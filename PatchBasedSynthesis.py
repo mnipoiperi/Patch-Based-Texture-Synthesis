@@ -6,16 +6,20 @@ import numpy as np
 from random import randint
 
 #Image Loading and initializations
-InputName = str(sys.argv[1])
+#InputName = str(sys.argv[1])
+InputName = 'corn.jpg'
 img_sample = cv2.imread(InputName)
-img_height = 250
-img_width  = 200
+img_height = 250 #output image height
+img_width  = 200 #output image width
 sample_width = img_sample.shape[1]
 sample_height = img_sample.shape[0]
 img = np.zeros((img_height,img_width,3), np.uint8)
-PatchSize = int(sys.argv[2])
-OverlapWidth = int(sys.argv[3])
-InitialThresConstant = float(sys.argv[4])
+#PatchSize = int(sys.argv[2])
+PatchSize = 30
+#OverlapWidth = int(sys.argv[3])
+OverlapWidth = 5
+#InitialThresConstant = float(sys.argv[4])
+InitialThresConstant = 78.0
 
 #Picking random patch to begin
 randomPatchHeight = randint(0, sample_height - PatchSize)
@@ -24,7 +28,7 @@ for i in range(PatchSize):
     for j in range(PatchSize):
         img[i, j] = img_sample[randomPatchHeight + i, randomPatchWidth + j]
 #initializating next 
-GrowPatchLocation = (0,PatchSize)
+GrowPatchLocation = (0,PatchSize) # indicate the location(top-left) of the patch in the process of calculating
 #---------------------------------------------------------------------------------------#
 #|                      Best Fit Patch and related functions                           |#
 #---------------------------------------------------------------------------------------#
@@ -223,18 +227,18 @@ def FillImage( imgPx, samplePx ):
 
 pixelsCompleted = 0
 TotalPatches = ( (img_height - 1 )/ PatchSize )*((img_width)/ PatchSize) - 1
-sys.stdout.write("Progress : [%-20s] %d%% | PixelsCompleted: %d | ThresholdConstant: --.------" % ('='*(pixelsCompleted*20/TotalPatches), (100*pixelsCompleted)/TotalPatches, pixelsCompleted))
+sys.stdout.write("Progress : [%-20s] %d%% | PixelsCompleted: %d | ThresholdConstant: --.------" % ('='*int(pixelsCompleted*20/TotalPatches), (100*pixelsCompleted)/TotalPatches, pixelsCompleted))
 sys.stdout.flush()
 while GrowPatchLocation[0] + PatchSize < img_height:
     pixelsCompleted += 1
     ThresholdConstant = InitialThresConstant
-    #set progress to zer0
+    #set progress to zero
     progress = 0 
     while progress == 0:
         ThresholdOverlapError = ThresholdConstant * PatchSize * OverlapWidth
         #Get Best matches for current pixel
         List = GetBestPatches(GrowPatchLocation)
-        if len(List) > 0:
+        if len(List) > 0: 
             progress = 1
             #Make A random selection from best fit pxls
             sampleMatch = List[ randint(0, len(List) - 1) ]
@@ -246,11 +250,11 @@ while GrowPatchLocation[0] + PatchSize < img_height:
             if GrowPatchLocation[1] + PatchSize > img_width:
                 GrowPatchLocation = (GrowPatchLocation[0] + PatchSize, 0)
         #if not progressed, increse threshold
-        else:
+        else: #error-threshold is too low that there's no any candidate
             ThresholdConstant *= 1.1
     # print pixelsCompleted, ThresholdConstant
     sys.stdout.write('\r')
-    sys.stdout.write("Progress : [%-20s] %d%% | PixelsCompleted: %d | ThresholdConstant: %f" % ('='*(pixelsCompleted*20/TotalPatches), (100*pixelsCompleted)/TotalPatches, pixelsCompleted, ThresholdConstant))
+    sys.stdout.write("Progress : [%-20s] %d%% | PixelsCompleted: %d | ThresholdConstant: %f" % ('='*int(pixelsCompleted*20/TotalPatches), (100*pixelsCompleted)/TotalPatches, pixelsCompleted, ThresholdConstant))
     sys.stdout.flush()
     
 # Displaying Images
