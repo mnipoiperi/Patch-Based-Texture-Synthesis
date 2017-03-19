@@ -25,7 +25,7 @@ def getOverlapError(output, outputL, texture, textureL, patchSize, overlapW):
     return (np.sum(diffH**2)+np.sum(diffV**2))**0.5
 
 
-def getListofBestPatches(target, texture, output, size_texture, pL, patchSize, overlapW, errorTH, iterationtime):
+def getListofBestPatches(target, texture, texture_RGB, output, size_texture, pL, patchSize, overlapW, errorTH, iterationtime):
     # get the list of patches on texture which is similiart to the patch in the target
     # pL: patch location
     # errorTH: the maximum value of the SSD error which is allowed
@@ -35,7 +35,7 @@ def getListofBestPatches(target, texture, output, size_texture, pL, patchSize, o
         i = randint(overlapW, size_texture[0]-patchSize)
         j = randint(overlapW, size_texture[1]-patchSize)
         patchError = 0.8*getPatchesError(target, pL, texture, (i,j), patchSize)
-        overlapError = 0.2*getOverlapError(output, pL, texture, (i,j), patchSize, overlapW)
+        overlapError = 0.2*getOverlapError(output, pL, texture_RGB, (i,j), patchSize, overlapW)
         if patchError+overlapError < errorTH:
             patchLList.append((i, j))
         elif patchError+overlapError < errorTH/2:
@@ -62,7 +62,7 @@ def getBoundaryH(output, outputPL, texture, texturePL, patchSize, overlapW):
     texture = texture.astype(np.int)
     costMatrix = np.zeros((overlapW, patchSize), np.int)
     DPmap = np.zeros((overlapW, patchSize), np.int)
-    costMatrix[:, 0] = (output[outputPL[0]-overlapW:outputPL[0], outputPL[1]]-texture[texturePL[0]-overlapW:texturePL[0], texturePL[1]])**2
+    costMatrix[:, 0] = np.sum((output[outputPL[0]-overlapW:outputPL[0], outputPL[1]]-texture[texturePL[0]-overlapW:texturePL[0], texturePL[1]])**2)
     # build cost matrix and DPmap
     for j in range(1, patchSize):
         for i in range(overlapW):
@@ -87,7 +87,7 @@ def getBoundaryV(output, outputPL, texture, texturePL, patchSize, overlapW):
     texture = texture.astype(np.int)
     costMatrix = np.zeros((patchSize, overlapW), np.int)
     DPmap = np.zeros((patchSize, overlapW), np.int)
-    costMatrix[0, :] = (output[outputPL[0], outputPL[1]-overlapW:outputPL[1]]-texture[texturePL[0], texturePL[1]-overlapW:texturePL[1]])**2
+    costMatrix[0, :] = np.sum((output[outputPL[0], outputPL[1]-overlapW:outputPL[1]]-texture[texturePL[0], texturePL[1]-overlapW:texturePL[1]])**2)
     # build cost matrix and DPmap
     for i in range(1, patchSize):
         for j in range(overlapW):
@@ -136,19 +136,19 @@ if __name__ == "__main__":
     #patchSize  = int(sys.argv[3])
     #overlapSize = int(sys.argv[4])
     #initialThresConstant = float(sys.argv[5])
-    inputName = 'target.jpg' 
-    textureName = 'texture2.jpg'
-    patchSize = 23
-    overlapSize = 5
-    initialiThresConstant = 2.5 #78.0
+    inputName = 'target_resize.jpg' 
+    textureName = 'texture_brown_resize.jpg'
+    patchSize = 10
+    overlapSize = 3
+    initialiThresConstant = 5 #78.0
     # initialize
-    img_input = cv2.imread(inputName)
-    img_input = cv2.cvtColor(img_input, cv2.COLOR_BGR2GRAY)
-    img_texture = cv2.imread(textureName)
-    img_texture = cv2.cvtColor(img_texture, cv2.COLOR_BGR2GRAY)
+    img_input_RGB = cv2.imread(inputName)
+    img_input = cv2.cvtColor(img_input_RGB, cv2.COLOR_BGR2GRAY)
+    img_texture_RGB = cv2.imread(textureName)
+    img_texture = cv2.cvtColor(img_texture_RGB, cv2.COLOR_BGR2GRAY)
     size_input = img_input.shape
     size_texture = img_texture.shape
-    img_out = np.zeros(size_input, np.uint8)
+    img_out = np.zeros(img_input_RGB.shape, np.uint8)
     
     ### Begin with random patch ###
     # for texture transform, this step is not necessray
@@ -169,16 +169,16 @@ if __name__ == "__main__":
             listPL = []
             while(len(listPL)==0):
                 # get list of the best matches
-                listPL = getListofBestPatches(img_input, img_texture, img_out, size_texture, patchLOut, patchSize, overlapSize,errorTHofPatch, 200)
+                listPL = getListofBestPatches(img_input, img_texture, img_texture_RGB,img_out, size_texture, patchLOut, patchSize, overlapSize,errorTHofPatch, 200)
                 errorTHofPatch *= 1.1
                 if errorTHofPatch*1.1!=initialiThresConstant*patchSize*patchSize:
                     print('increase threshold of patch error')
             print('List length:' + str(len(listPL)))
             # random get patch in list and put patch onto output image
             patchL = listPL[randint(0, len(listPL)-1)]
-            img_out = fillImage(img_out, patchLOut, img_texture, patchL, patchSize)
+            img_out = fillImage(img_out, patchLOut, img_texture_RGB, patchL, patchSize)
             # Quilt
-            img_out = quiltPatches(img_out, patchLOut, img_texture, patchL, patchSize, overlapSize)
+            img_out = quiltPatches(img_out, patchLOut, img_texture_RGB, patchL, patchSize, overlapSize)
             # print commend line
             numPatchCompleted += 1
             print('completed num of patches: ' + str(numPatchCompleted))
