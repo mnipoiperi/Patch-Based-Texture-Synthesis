@@ -187,7 +187,7 @@ if __name__ == "__main__":
             numPatchCompleted += 1
             print('completed num of patches: ' + str(numPatchCompleted))
 
-    cv2.imwrite(sys.argv[1][2:-4]+'_'+sys.argv[2][2:], img_out)
+    cv2.imwrite('results\\' + sys.argv[1][8:-4]+'_'+sys.argv[2][8:], img_out)
     cv2.imshow('input', img_input_RGB)
     cv2.imshow('output', img_out)
     cv2.waitKey(0)
