@@ -131,21 +131,25 @@ def quiltPatches(output, outputPL, texture, texturePL, patchSize, overlapW):
 if __name__ == "__main__":
     ###  Image Loading and initialization ###
     # get parameters from argv
-    #inputName  = str(sys,argv[1])
-    #textureName  = str(sys,argv[2])
-    #patchSize  = int(sys.argv[3])
-    #overlapSize = int(sys.argv[4])
-    #initialThresConstant = float(sys.argv[5])
-    inputName = 'target_resize.jpg' 
-    textureName = 'texture_brown_resize.jpg'
-    patchSize = 10
-    overlapSize = 3
-    initialiThresConstant = 5 #78.0
+    inputName  = str(sys.argv[1])
+    textureName  = str(sys.argv[2])
+    patchSize  = int(sys.argv[3])
+    overlapSize = int(sys.argv[4])
+    initialThresConstant = float(sys.argv[5])
+    #inputName = 'target_resize.jpg' 
+    #textureName = 'texture_brown_resize.jpg'
+    #patchSize = 10
+    #overlapSize = 3
+    #initialThresConstant = 5 #78.0
     # initialize
     img_input_RGB = cv2.imread(inputName)
     img_input = cv2.cvtColor(img_input_RGB, cv2.COLOR_BGR2GRAY)
+    if(int(sys.argv[6])==1):
+        img_input = cv2.Canny(img_input,100,200)
     img_texture_RGB = cv2.imread(textureName)
     img_texture = cv2.cvtColor(img_texture_RGB, cv2.COLOR_BGR2GRAY)
+    if(int(sys.argv[6])==1):
+        img_texture = cv2.Canny(img_texture,100,200)
     size_input = img_input.shape
     size_texture = img_texture.shape
     img_out = np.zeros(img_input_RGB.shape, np.uint8)
@@ -165,13 +169,13 @@ if __name__ == "__main__":
             if patchLOut[1]+patchSize>=size_input[1] :
                 patchLOut[1] = size_input[1]-patchSize
             # setting of threshold of patch-error            
-            errorTHofPatch = initialiThresConstant * patchSize * patchSize
+            errorTHofPatch = initialThresConstant * patchSize * patchSize
             listPL = []
             while(len(listPL)==0):
                 # get list of the best matches
                 listPL = getListofBestPatches(img_input, img_texture, img_texture_RGB,img_out, size_texture, patchLOut, patchSize, overlapSize,errorTHofPatch, 200)
                 errorTHofPatch *= 1.1
-                if errorTHofPatch*1.1!=initialiThresConstant*patchSize*patchSize:
+                if errorTHofPatch*1.1!=initialThresConstant*patchSize*patchSize:
                     print('increase threshold of patch error')
             print('List length:' + str(len(listPL)))
             # random get patch in list and put patch onto output image
@@ -183,6 +187,7 @@ if __name__ == "__main__":
             numPatchCompleted += 1
             print('completed num of patches: ' + str(numPatchCompleted))
 
-    cv2.imshow('input', img_input)
+    cv2.imwrite(sys.argv[1][2:-4]+'_'+sys.argv[2][2:], img_out)
+    cv2.imshow('input', img_input_RGB)
     cv2.imshow('output', img_out)
     cv2.waitKey(0)
