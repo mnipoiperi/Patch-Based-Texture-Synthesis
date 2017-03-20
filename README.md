@@ -15,5 +15,5 @@ To run the code
 'python PatchBasedTextureTransform.py target-image texture-image patch-size overlap-width initial-threshold-error using-edge'
 
 for example
-'python PatchBasedTextureTransform.py target_minion.jpg texture3.jpg 10 6 8 0'
+'python PatchBasedTextureTransform.py input/target_minion.jpg input/texture3.jpg 10 6 9 0'
 
