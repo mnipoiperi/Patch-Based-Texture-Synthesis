@@ -19,9 +19,12 @@ for example
 
 ## results
  - input image
+
     ![](input/target_minion.jpg)
  - texture image
+
     ![](input/texture3.jpg)
  - output image
+ 
     ![](results/target_minion_texture3.jpg)
 
