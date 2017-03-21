@@ -133,9 +133,10 @@ if __name__ == "__main__":
     # get parameters from argv
     inputName  = str(sys.argv[1])
     textureName  = str(sys.argv[2])
-    patchSize  = int(sys.argv[3])
-    overlapSize = int(sys.argv[4])
-    initialThresConstant = float(sys.argv[5])
+    outputName = str(sys.argv[3])
+    patchSize  = int(sys.argv[4])
+    overlapSize = int(sys.argv[5])
+    initialThresConstant = float(sys.argv[6])
     #inputName = 'target_resize.jpg' 
     #textureName = 'texture_brown_resize.jpg'
     #patchSize = 10
@@ -187,7 +188,7 @@ if __name__ == "__main__":
             numPatchCompleted += 1
             print('completed num of patches: ' + str(numPatchCompleted))
 
-    cv2.imwrite('results\\' + sys.argv[1][8:-4]+'_'+sys.argv[2][8:], img_out)
+    cv2.imwrite('results\\' + outputName, img_out)
     cv2.imshow('input', img_input_RGB)
     cv2.imshow('output', img_out)
     cv2.waitKey(0)
