@@ -10,10 +10,18 @@ The running time depends on Sample Image dimensions, Desired Image dimensions, T
 for example
 'python PatchBasedSynthesis.py corn.jpg 30 5 78.0'
 
-# Patch_Based-Texture-Transform-Synthesis
+# Patch_Based-Texture-Transfer-Synthesis
 To run the code
-'python PatchBasedTextureTransform.py target-image texture-image patch-size overlap-width initial-threshold-error using-edge'
+'python PatchBasedTextureTransfer.py target-image texture-image output-image patch-size overlap-width initial-threshold-error using-edge'
 
 for example
-'python PatchBasedTextureTransform.py input/target_minion.jpg input/texture3.jpg 10 6 9 0'
+'python PatchBasedTextureTransfer.py input/target_minion.jpg input/texture3.jpg result.jpg 10 6 9 0'
+
+## results
+ - input image
+    ![](input/target_minion.jpg)
+ - texture image
+    ![](input/texture3.jpg)
+ - output image
+    ![](results/target_minion_texture3.jpg)
 
