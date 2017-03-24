@@ -145,18 +145,18 @@ if __name__ == "__main__":
     # initialize
     img_input_RGB = cv2.imread(inputName)
     img_input = cv2.cvtColor(img_input_RGB, cv2.COLOR_BGR2GRAY)
-    if(int(sys.argv[6])==1):
+    if(int(sys.argv[7])==1):
         img_input = cv2.Canny(img_input,100,200)
     img_texture_RGB = cv2.imread(textureName)
     img_texture = cv2.cvtColor(img_texture_RGB, cv2.COLOR_BGR2GRAY)
-    if(int(sys.argv[6])==1):
+    if(int(sys.argv[7])==1):
         img_texture = cv2.Canny(img_texture,100,200)
     size_input = img_input.shape
     size_texture = img_texture.shape
     img_out = np.zeros(img_input_RGB.shape, np.uint8)
     
     ### Begin with random patch ###
-    # for texture transform, this step is not necessray
+    # for texture transfer, this step is not necessray
 
     ### for loop to find the all corresponding patches on output image ###
     print('total num of patches: ' + str(int(np.ceil(size_input[0]/patchSize)*np.ceil(size_input[1]/patchSize))))
